@@ -1,0 +1,15 @@
+def somePajtung():
+  global placki
+  placki = 16521;
+
+  if placki == True:
+    pass
+  
+  if placki is None:
+    return "abecadło z pieca \" spadło"
+    
+    
+    if placki_ziemniaczane > puszyste_0:
+      pass
+    else:
+      print('Lubie jesc placki')

@@ -46,7 +46,7 @@ class Scanner:
 
   def peek(self):
     return self.c_str[self.cur_char_i] if self.cur_char_i < len(self.c_str) else ''
-  
+
   def get_pos(self):
     return self.cur_char_i
   def set_pos(self, i):
@@ -58,9 +58,12 @@ class Scanner:
       while self.peek().isspace():
         self.get()
       #return Token('', start_i) # White character token
-    
+
     start_i = self.get_pos()
     c_char = self.get()
+    if c_char == '':
+      return Token('EOF', start_i)
+
     if c_char.isdigit():
       c_val = c_char
       while self.peek().isdigit():
@@ -74,7 +77,7 @@ class Scanner:
           break
         c_val += self.get()
       return Token('IDENTIFIER', start_i, c_val)
-    
+
     # Handle simple operators
     # if simple_operators[c_char]:
     #  return Token(simple_operators[c_char], start_i)
@@ -83,30 +86,35 @@ class Scanner:
     current_simple_id = c_char
     if not any_simple_operator_startsWith(current_simple_id):
       raise Exception(f"Unexpected character at {start_i} - `{c_char}`")
-    
+
     last_valid_operator = current_simple_id if current_simple_id in simple_operators else None
     last_valid_operator_end_i = self.get_pos() # Position where we renew scanning
     while True:
-      current_simple_id += self.peek()
+      next_char = self.peek()
+      if next_char == '':
+        break
+      current_simple_id += next_char
       if not any_simple_operator_startsWith(current_simple_id):
         break
       self.get()
       if current_simple_id in simple_operators:
         last_valid_operator = current_simple_id
         last_valid_operator_end_i = self.get_pos()
-    
+
     if last_valid_operator is not None:
       self.set_pos(last_valid_operator_end_i)
       return Token(simple_operators[last_valid_operator], start_i)
     # End
 
     raise Exception(f"Unexpected character at {start_i} - `{c_char}`")
- 
+
   def run_scanner(self):
     tokens = []
-    while self.cur_char_i != len(self.c_str):
+    while self.cur_char_i <= len(self.c_str):
       token = self.scan()
       tokens.append(token)
+    
+    tokens.pop() # Remove EOF token
 
     return tokens
 
